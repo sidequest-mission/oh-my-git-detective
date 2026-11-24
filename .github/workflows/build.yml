@@ -2,8 +2,12 @@ name: "Build"
 
 on:
   push:
+    branches: [ "main", "master", "godot3_4_migration", "**" ]
     tags:
       - '*'
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
 
 env:
   PROJECT_NAME: oh-my-git
@@ -15,48 +19,67 @@ jobs:
     container:
       image: barichello/godot-ci:4.7.1
     steps:
-      - name: Get tag name
+      - name: Get tag or branch name
         id: tag_name
-        run: echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+          else
+            echo "TAG_NAME=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Install dependencies
         run: apt-get update && apt-get install -y rsync p7zip make
+
       - uses: actions/checkout@v4
+
       - name: Setup
         run: |
           mkdir -p ~/.local/share/godot/export_templates
           mv /root/.local/share/godot/export_templates/$GODOT_VERSION.stable ~/.local/share/godot/export_templates/$GODOT_VERSION.stable
+
       - name: Build Linux
         run: make linux
+
       - name: Build macOS
         run: make macos
+
       - name: Build Windows
         run: make windows
+
       - name: Clean up
         run: make clean-unzipped
-      - name: Deploy Linux
+
+      - name: Deploy Linux (Itch.io)
+        if: ${{ secrets.BUTLER_CREDENTIALS != '' }}
         uses: josephbmanley/butler-publish-itchio-action@v1.0.3
         env:
           BUTLER_CREDENTIALS: ${{ secrets.BUTLER_CREDENTIALS }}
           CHANNEL: linux
           ITCH_GAME: ${{ env.PROJECT_NAME }}
-          ITCH_USER: blinry
+          ITCH_USER: sidequest-mission
           PACKAGE: build/${{ env.PROJECT_NAME }}-linux.zip
           VERSION: ${{ steps.tag_name.outputs.TAG_NAME }}
-      - name: Deploy macOS
+
+      - name: Deploy macOS (Itch.io)
+        if: ${{ secrets.BUTLER_CREDENTIALS != '' }}
         uses: josephbmanley/butler-publish-itchio-action@v1.0.3
         env:
           BUTLER_CREDENTIALS: ${{ secrets.BUTLER_CREDENTIALS }}
           CHANNEL: osx
           ITCH_GAME: ${{ env.PROJECT_NAME }}
-          ITCH_USER: blinry
+          ITCH_USER: sidequest-mission
           PACKAGE: build/${{ env.PROJECT_NAME }}-macos.zip
           VERSION: ${{ steps.tag_name.outputs.TAG_NAME }}
-      - name: Deploy Windows
+
+      - name: Deploy Windows (Itch.io)
+        if: ${{ secrets.BUTLER_CREDENTIALS != '' }}
         uses: josephbmanley/butler-publish-itchio-action@v1.0.3
         env:
           BUTLER_CREDENTIALS: ${{ secrets.BUTLER_CREDENTIALS }}
           CHANNEL: windows
           ITCH_GAME: ${{ env.PROJECT_NAME }}
-          ITCH_USER: blinry
+          ITCH_USER: sidequest-mission
           PACKAGE: build/${{ env.PROJECT_NAME }}-windows.zip
           VERSION: ${{ steps.tag_name.outputs.TAG_NAME }}
+
