@@ -1,8 +1,10 @@
-res://scenes/game.tscn
-res://styles/theme.tres
-res://scenes/shell.gd
+res://scenes/card.tscn
+res://scenes/file_browser.gd
+res://scenes/file_browser_item.tscn
+res://scenes/input_dialog.tscn
+res://scenes/level_select.gd
+res://scenes/main.gd
+res://scenes/notification.tscn
+res://scenes/repository.tscn
 res://scenes/terminal.gd
-res://scenes/shell_command.gd
-res://scenes/game.gd
-res://scenes/helpers.gd
-res://scenes/repository.gd
+res://styles/theme.tres
