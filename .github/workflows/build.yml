@@ -30,7 +30,9 @@ jobs:
           fi
 
       - name: Install dependencies
-        run: apt-get update && apt-get install -y rsync p7zip make
+        run: |
+          apt-get update && apt-get install -y \
+            rsync p7zip make libfontconfig1 libx11-6 libxcursor1 libxext6 libxi6 libxinerama1 librandr2 libgl1-mesa-glx
 
       - uses: actions/checkout@v4
 
