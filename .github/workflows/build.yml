@@ -16,8 +16,6 @@ env:
 jobs:
   build:
     runs-on: ubuntu-24.04
-    env:
-      BUTLER_CREDENTIALS: ${{ secrets.BUTLER_CREDENTIALS }}
     container:
       image: barichello/godot-ci:4.7.1
     steps:
@@ -51,34 +49,4 @@ jobs:
 
       - name: Clean up
         run: make clean-unzipped
-
-      - name: Deploy Linux (Itch.io)
-        if: ${{ env.BUTLER_CREDENTIALS != '' }}
-        uses: josephbmanley/butler-publish-itchio-action@v1.0.3
-        env:
-          CHANNEL: linux
-          ITCH_GAME: ${{ env.PROJECT_NAME }}
-          ITCH_USER: sidequest-mission
-          PACKAGE: build/${{ env.PROJECT_NAME }}-linux.zip
-          VERSION: ${{ steps.tag_name.outputs.TAG_NAME }}
-
-      - name: Deploy macOS (Itch.io)
-        if: ${{ env.BUTLER_CREDENTIALS != '' }}
-        uses: josephbmanley/butler-publish-itchio-action@v1.0.3
-        env:
-          CHANNEL: osx
-          ITCH_GAME: ${{ env.PROJECT_NAME }}
-          ITCH_USER: sidequest-mission
-          PACKAGE: build/${{ env.PROJECT_NAME }}-macos.zip
-          VERSION: ${{ steps.tag_name.outputs.TAG_NAME }}
-
-      - name: Deploy Windows (Itch.io)
-        if: ${{ env.BUTLER_CREDENTIALS != '' }}
-        uses: josephbmanley/butler-publish-itchio-action@v1.0.3
-        env:
-          CHANNEL: windows
-          ITCH_GAME: ${{ env.PROJECT_NAME }}
-          ITCH_USER: sidequest-mission
-          PACKAGE: build/${{ env.PROJECT_NAME }}-windows.zip
-          VERSION: ${{ steps.tag_name.outputs.TAG_NAME }}
 
