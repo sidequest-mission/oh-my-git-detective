@@ -1,34 +1,22 @@
-name = "oh-my-git"
+PROJECT_NAME = oh-my-git
 
 all: linux macos windows
 
 linux:
-	mkdir -p build/$(name)-linux
-	godot --export-release "Linux" "build/$(name)-linux/$(name)"
-	cd build/$(name)-linux && zip -r ../$(name)-linux.zip *
+	mkdir -p build/$(PROJECT_NAME)-linux
+	godot --headless --export-release "Linux" "build/$(PROJECT_NAME)-linux/$(PROJECT_NAME)"
+	cd build && zip -r $(PROJECT_NAME)-linux.zip $(PROJECT_NAME)-linux
 
 macos:
-	mkdir -p build
-	godot --export-release "Mac OS" "build/$(name)-macos.zip"
+	mkdir -p build/$(PROJECT_NAME)-macos
+	godot --headless --export-release "macOS" "build/$(PROJECT_NAME)-macos/$(PROJECT_NAME).zip"
 
-windows: dependencies/windows/git/
-	mkdir -p build/$(name)-windows
-	# We're using the debug template here so that the bash.exe doesn't spawn a cmd.exe each time...
-	godot --export-debug "Windows" "build/$(name)-windows/$(name).exe"
-	cp -r --parents dependencies/windows/git/ build/$(name)-windows/
-	cd build/$(name)-windows && zip -r ../$(name)-windows.zip *
+windows:
+	mkdir -p build/$(PROJECT_NAME)-windows
+	godot --headless --export-release "Windows Desktop" "build/$(PROJECT_NAME)-windows/$(PROJECT_NAME).exe"
+	cd build && zip -r $(PROJECT_NAME)-windows.zip $(PROJECT_NAME)-windows
 
 clean-unzipped:
-	cd build && ls | grep -v '\.zip$$' | xargs rm -r
-
-clean:
-	rm -rf build dependencies cache
-
-# Dependencies:
-
-cache/portablegit.7z.exe:
-	mkdir -p cache
-	wget https://github.com/git-for-windows/git/releases/download/v2.28.0.windows.1/PortableGit-2.28.0-64-bit.7z.exe -O cache/portablegit.7z.exe
-
-dependencies/windows/git/: cache/portablegit.7z.exe
-	7zr x cache/portablegit.7z.exe -odependencies/windows/git/ -y
+	rm -rf build/$(PROJECT_NAME)-linux
+	rm -rf build/$(PROJECT_NAME)-macos
+	rm -rf build/$(PROJECT_NAME)-windows

@@ -1,21 +1,57 @@
-PROJECT_NAME = oh-my-git
+name: "Build"
 
-linux:
-	mkdir -p build/$(PROJECT_NAME)-linux
-	godot --headless --export-release "Linux" "build/$(PROJECT_NAME)-linux/$(PROJECT_NAME)"
-	cd build && zip -r $(PROJECT_NAME)-linux.zip $(PROJECT_NAME)-linux
+on:
+  push:
+    branches: [ "main", "master", "godot3_4_migration", "**" ]
+    tags:
+      - '*'
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
 
-macos:
-	mkdir -p build/$(PROJECT_NAME)-macos
-	godot --headless --export-release "macOS" "build/$(PROJECT_NAME)-macos/$(PROJECT_NAME).zip"
+env:
+  PROJECT_NAME: oh-my-git
+  GODOT_VERSION: 4.7.1
 
-windows:
-	mkdir -p build/$(PROJECT_NAME)-windows
-	godot --headless --export-release "Windows Desktop" "build/$(PROJECT_NAME)-windows/$(PROJECT_NAME).exe"
-	cd build && zip -r $(PROJECT_NAME)-windows.zip $(PROJECT_NAME)-windows
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    container:
+      image: barichello/godot-ci:4.7.1
+    steps:
+      - name: Get tag or branch name
+        id: tag_name
+        shell: bash
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+          else
+            echo "TAG_NAME=${GITHUB_SHA:0:7}" >> "$GITHUB_OUTPUT"
+          fi
 
-clean-unzipped:
-	rm -rf build/$(PROJECT_NAME)-linux
-	rm -rf build/$(PROJECT_NAME)-macos
-	rm -rf build/$(PROJECT_NAME)-windows
+      - name: Install dependencies
+        run: |
+          apt-get update && apt-get install -y \
+            rsync p7zip make \
+            libfontconfig1 libx11-6 libxcursor1 libxext6 libxi6 libxinerama1 libxrandr2 libgl1 \
+            libxkbcommon0 libwayland-cursor0 libwayland-client0 libwayland-egl1
+
+      - uses: actions/checkout@v4
+
+      - name: Setup
+        run: |
+          mkdir -p ~/.local/share/godot/export_templates
+          mv /root/.local/share/godot/export_templates/$GODOT_VERSION.stable ~/.local/share/godot/export_templates/$GODOT_VERSION.stable
+
+      - name: Build Linux
+        run: make linux
+
+      - name: Build macOS
+        run: make macos
+
+      - name: Build Windows
+        run: make windows
+
+      - name: Clean up
+        run: make clean-unzipped
 
