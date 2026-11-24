@@ -13,10 +13,11 @@ macos:
 
 windows:
 	mkdir -p build/$(PROJECT_NAME)-windows
-	godot --headless --export-release "Windows Desktop" "build/$(PROJECT_NAME)-windows/$(PROJECT_NAME).exe"
+	godot --headless --export-release "Windows" "build/$(PROJECT_NAME)-windows/$(PROJECT_NAME).exe"
 	cd build && zip -r $(PROJECT_NAME)-windows.zip $(PROJECT_NAME)-windows
 
 clean-unzipped:
 	rm -rf build/$(PROJECT_NAME)-linux
 	rm -rf build/$(PROJECT_NAME)-macos
 	rm -rf build/$(PROJECT_NAME)-windows
+
