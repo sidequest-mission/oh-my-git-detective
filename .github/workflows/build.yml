@@ -32,7 +32,9 @@ jobs:
       - name: Install dependencies
         run: |
           apt-get update && apt-get install -y \
-            rsync p7zip make libfontconfig1 libx11-6 libxcursor1 libxext6 libxi6 libxinerama1 libxrandr2 libgl1
+            rsync p7zip make \
+            libfontconfig1 libx11-6 libxcursor1 libxext6 libxi6 libxinerama1 libxrandr2 libgl1 \
+            libxkbcommon0 libwayland-cursor0 libwayland-client0 libwayland-egl1
 
       - uses: actions/checkout@v4
 
