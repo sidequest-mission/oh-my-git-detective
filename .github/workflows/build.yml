@@ -21,11 +21,12 @@ jobs:
     steps:
       - name: Get tag or branch name
         id: tag_name
+        shell: bash
         run: |
           if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
             echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
           else
-            echo "TAG_NAME=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+            echo "TAG_NAME=${GITHUB_SHA:0:7}" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Install dependencies
