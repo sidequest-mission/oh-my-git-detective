@@ -31,13 +31,18 @@ git commit -m "Adding ingredients"
 
 echo "- 500g Flour" >> recipe
 git stash push
+git rev-parse stash:recipe > .git/stashed-recipe
 
+git rev-parse stash^1 > .git/stash-base
 git checkout main
 
 [win]
 
 # Did you create a new branch from the stashed changes?
-test "$(git branch --list| wc -l)" -ge 2
+BRANCH=$(git symbolic-ref --short HEAD) && test "$BRANCH" != main &&
+git merge-base --is-ancestor "$(cat .git/stash-base)" HEAD &&
+test -z "$(git stash list)" &&
+test "$(git hash-object recipe)" = "$(cat .git/stashed-recipe)"
 
 [actions]
 

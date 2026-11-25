@@ -38,5 +38,5 @@ cp form2_final.txt form2_really_final.txt
 
 [win]
 
-# Add another line to form2_really_final.txt!
-test "$(cat form2_really_final.txt | wc -l )" -ge 5
+# Add one more reason to form2_really_final.txt!
+awk 'NF { reasons++ } END { exit !(NR >= 5 && reasons >= 4) }' form2_really_final.txt

@@ -16,7 +16,7 @@ rm -rf .git
 [win]
 
 # Initialize the time machine!
-test -d .git
+test "$(git rev-parse --is-inside-work-tree)" = true && test -z "$(git rev-parse --show-prefix)"
 
 [congrats]
 

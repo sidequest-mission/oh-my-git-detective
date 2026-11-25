@@ -7,10 +7,7 @@ Welcome to today's lesson! We're going to learn how to make commits with more pr
 
 Have a look at these two timelines. They have exactly the same outcome. But one of them makes it much easier to figure out what happened.
 
-[win]
-
-# Right! Having each change in its own commit makes it easier to understand what's going on! Let's learn how to do that!
-git branch --show-current | grep step-by-step
+Choose the clearer timeline, then edit the smoke detector so its alarm is sounding and commit the change.
 
 [setup]
 
@@ -47,5 +44,9 @@ git checkout HEAD~3
 
 [win]
 
-# Pick the timeline that's clearer, and make the alarm go off!
-git show step-by-step:smoke_detector | tail -n 1 | grep -v "absolutely silent"
+# Switch to the clearer timeline.
+test "$(git branch --show-current)" = step-by-step
+
+# Commit the sounding alarm on that timeline.
+ALARM=$(git show step-by-step:smoke_detector) &&
+test -n "$ALARM" && ! grep -q 'absolutely silent' <<< "$ALARM"

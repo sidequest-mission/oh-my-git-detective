@@ -40,7 +40,11 @@ git add recipe
 [win]
 
 # Did you resolve the conflict and commit?
-{ git show HEAD | grep "Flour"; } && { git show HEAD | grep "Salt"; }
+RECIPE=$(git show HEAD:recipe) &&
+grep -Fxq -- '- 4 Apples' <<< "$RECIPE" &&
+grep -Fxq -- '- 500g Flour' <<< "$RECIPE" &&
+grep -Fxq -- '- Pinch of Salt' <<< "$RECIPE" &&
+! grep -Eq '^(<{7}|={7}|>{7}|[|]{7})' <<< "$RECIPE"
 
 # Did you clear stash stack?
 test "$(git stash list | wc -l)" -eq 0

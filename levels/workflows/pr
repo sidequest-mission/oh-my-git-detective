@@ -18,9 +18,9 @@ git commit -m "Initial commit"
 
 [actions friend]
 
-git ls-remote yours | grep pr && git fetch yours && git merge yours/solution
-git show main:file | grep 5 && hint "Thanks!"
+git ls-remote --exit-code yours refs/tags/pr && git fetch yours && git merge yours/solution
+EQUATION=$(git show main:file) && [[ $EQUATION =~ ^[[:blank:]]*2[[:blank:]]*[+][[:blank:]]*3[[:blank:]]*=[[:blank:]]*5[[:blank:]]*$ ]] && hint "Thanks!"
 
 [win friend]
 
-git show main:file | grep 5
+EQUATION=$(git show main:file) && [[ $EQUATION =~ ^[[:blank:]]*2[[:blank:]]*[+][[:blank:]]*3[[:blank:]]*=[[:blank:]]*5[[:blank:]]*$ ]]

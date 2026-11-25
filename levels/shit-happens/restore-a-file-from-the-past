@@ -15,7 +15,10 @@ git commit -m "Initial commit"
 echo "bad version" > essay
 git commit -am "\"Improve\" essay"
 
+git rev-parse HEAD > .git/starting-commit
+
 [win]
 
 # Get the first version of your essay, and make a new commit with it.
+git merge-base --is-ancestor "$(cat .git/starting-commit)" main^ &&
 test "$(git show main:essay)" = "good version"

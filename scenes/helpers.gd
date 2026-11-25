@@ -123,7 +123,10 @@ func parse(file):
 		var m = section_regex.search(line)
 		if m:
 			current_section = m.get_string(1)
-			result[current_section] = ""
+			if result.has(current_section):
+				push_warning("Duplicate section [%s] in %s" % [current_section, file])
+			else:
+				result[current_section] = ""
 			continue
 		
 		# Parse a direct=assignment.

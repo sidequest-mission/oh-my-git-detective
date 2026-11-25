@@ -10,8 +10,8 @@ var drag_offset
 @export var energy = 0: set = set_energy
 
 var _first_argument = null
-var _home_position = null
-var _home_rotation = null
+@onready var _home_position := position
+@onready var _home_rotation := rotation_degrees
 
 @onready var energy_label = $Sprite2D/Energy
 

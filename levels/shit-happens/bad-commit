@@ -20,11 +20,15 @@ git commit -m "Initial commit"
 echo "1 2 3 4 5 6 7 8 9 11" > numbers
 git commit -am "More numberrrrrs"
 
+git rev-parse HEAD > .git/starting-commit
+
 [win]
 
 # In the last main commit, the numbers file contains the numbers from 1 to 10.
 test "$(git show main:numbers)" = "1 2 3 4 5 6 7 8 9 10"
 # The commit message of that commit is "More numbers".
-git log -1 --oneline | grep "More numbers"
+test "$(git log -1 --format=%s main)" = "More numbers"
 # The commit with the typo is not part of the main branch anymore.
-git log --oneline | grep -v "rrrrr"
+BAD=$(cat .git/starting-commit)
+test "$(git rev-parse --verify main^)" = "$(git rev-parse "$BAD^")" &&
+! git merge-base --is-ancestor "$BAD" main

@@ -22,13 +22,14 @@ echo "The glass is full of water." > glass
 [win]
 
 # Make a snapshot of the glass (a "commit")
-git rev-parse HEAD
+FIRST=$(git rev-list --first-parent --max-parents=0 main) &&
+test "$(git show "$FIRST:glass")" = "The glass is full of water."
 
 # Change the contents of the glass!
-! test "$(cat glass)" = "The glass is full of water."
+test -f glass && ! test "$(cat glass)" = "The glass is full of water."
 
 # And make a second commit!
-git rev-parse HEAD^ && ! test "$(git show main:glass)" = "The glass is full of water."
+git rev-parse --verify main^ && GLASS=$(git show main:glass) && ! test "$GLASS" = "The glass is full of water."
 
 [congrats]
 

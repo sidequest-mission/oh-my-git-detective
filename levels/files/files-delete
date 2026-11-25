@@ -24,12 +24,10 @@ echo An extra thick spider web is right beside your door. > thick_web
 [win]
 
 # Remove all spider webs.
-! ls | grep thick_web &&
-! ls | grep big_web &&
-! ls | grep tiny_web
+test ! -e thick_web && test ! -e big_web && test ! -e tiny_web
 
 # But make sure you keep your bed!
-ls | grep bed
+test -f bed && test "$(cat bed)" = "A cozy bed."
 
 [congrats]
 

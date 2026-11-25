@@ -30,12 +30,14 @@ git commit -m "Adding ingredients"
 echo "- 500g Flour" >> recipe
 
 git stash push
+git rev-parse stash:recipe > .git/stashed-recipe
 git checkout main
 
 [win]
 
 # Did you pop the changes from the stash stack?
-test "$(git stash list | wc -l)" -eq 0
+test -z "$(git stash list)" &&
+test "$(git hash-object recipe)" = "$(cat .git/stashed-recipe)"
 
 [actions]
 

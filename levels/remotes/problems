@@ -25,7 +25,7 @@ git commit -a -m "friends version"
 [win]
 
 # Commit your local changes.
-test "$(git status -s)" = ""
+git log main --format= -p -- file | grep -Fxq "+The bike shed should be green"
 
 [win friend]
 

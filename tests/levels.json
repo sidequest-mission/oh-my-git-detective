@@ -1,0 +1,491 @@
+{
+  "intro/risky": {
+    "wrong": {
+      "append": [
+        "form.txt",
+        ""
+      ]
+    },
+    "expected_goals": [
+      false
+    ],
+    "solution": [
+      {
+        "append": [
+          "form.txt",
+          "- I want to undo a mistake."
+        ]
+      }
+    ]
+  },
+  "intro/copies": {
+    "wrong": {
+      "append": [
+        "form2_really_final.txt",
+        ""
+      ]
+    },
+    "expected_goals": [
+      false
+    ],
+    "solution": [
+      {
+        "append": [
+          "form2_really_final.txt",
+          "- I want a backup."
+        ]
+      }
+    ]
+  },
+  "intro/init": {
+    "wrong": "mkdir .git",
+    "verify_wrong": "test -d .git && ! git rev-parse --git-dir",
+    "expected_goals": [
+      false
+    ],
+    "solution": [
+      "git init"
+    ]
+  },
+  "intro/cli": {
+    "wrong": "mkdir .git",
+    "verify_wrong": "test -d .git && ! git rev-parse --git-dir",
+    "expected_goals": [
+      false
+    ],
+    "solution": [
+      "git init"
+    ]
+  },
+  "intro/commit": {
+    "wrong": "git commit --allow-empty -m Nothing && rm glass && git commit --allow-empty -m StillNothing",
+    "verify_wrong": "test ! -e glass && test \"$(git rev-list --count HEAD)\" = 2 && test -z \"$(git ls-tree HEAD)\"",
+    "expected_goals": [
+      false,
+      false,
+      false
+    ],
+    "solution": [
+      {
+        "commit_card": "Take first snapshot"
+      },
+      {
+        "append": [
+          "glass",
+          "I drank the water."
+        ]
+      },
+      {
+        "commit_card": "Record empty glass"
+      }
+    ]
+  },
+  "intro/remote": {
+    "wrong": "git fetch teacher",
+    "verify_wrong": "git rev-parse --verify teacher/main && ! git merge-base --is-ancestor teacher/main main",
+    "expected_goals": [
+      false,
+      false,
+      false,
+      false
+    ],
+    "solution": [
+      "git pull",
+      "echo Samira >> students",
+      "git commit -am Introduce",
+      "git push"
+    ]
+  },
+  "files/files-delete": {
+    "wrong": "rm tiny_web big_web thick_web bed && touch bedpost",
+    "verify_wrong": "test -f bedpost && test ! -e bed",
+    "expected_goals": [
+      true,
+      false
+    ],
+    "solution": [
+      "rm -f tiny_web big_web thick_web"
+    ]
+  },
+  "files/files-add": {
+    "wrong": "echo blue > chair; echo blue > lamp",
+    "expected_goals": [
+      true,
+      false
+    ],
+    "solution": [
+      "echo yellow > chair; echo yellow > lamp"
+    ]
+  },
+  "branches/checkout-commit": {
+    "wrong": "git checkout --detach $(git reflog --all --format=\"%H %gs\" | awk '/commit: Little sister does something$/ {print $1; exit}')",
+    "expected_goals": [
+      false
+    ],
+    "solution": [
+      "git checkout --detach $(git reflog --all --format=\"%H %gs\" | awk '/commit: Little sister does something$/ {print $1; exit}') && git restore --source=HEAD^ -- little_sister piggy_bank && git commit -am Restore"
+    ]
+  },
+  "branches/fork": {
+    "wrong": "git checkout HEAD~2",
+    "expected_goals": [
+      true,
+      false
+    ],
+    "solution": [
+      "git checkout --detach $(git reflog --all --format=\"%H %gs\" | awk '/commit: The child buys something$/ {print $1; exit}') && echo \"Looks well fed\" > cage/lion && git commit -am Lunch"
+    ]
+  },
+  "branches/branch-create": {
+    "wrong": "git branch birthday HEAD",
+    "expected_goals": [
+      false,
+      false
+    ],
+    "solution": [
+      "git branch -f birthday $(git reflog --all --format=\"%H %gs\" | awk '/commit: Go to the birthday$/ {print $1; exit}') && git branch concert $(git reflog --all --format=\"%H %gs\" | awk '/commit: Go to the concert$/ {print $1; exit}')"
+    ]
+  },
+  "branches/grow": {
+    "wrong": "git checkout --detach birthday && git commit --allow-empty -m Unchanged && git checkout concert && git commit --allow-empty -m Unchanged",
+    "verify_wrong": "git diff --quiet concert^ concert -- you && git rev-parse --verify concert^^",
+    "expected_goals": [
+      false,
+      false
+    ],
+    "solution": [
+      "git checkout --detach birthday && echo cake >> you && git commit -am cake",
+      "git checkout concert && echo applause >> you && git commit -am applause"
+    ]
+  },
+  "branches/branch-remove": {
+    "wrong": "git branch -D music",
+    "expected_goals": [
+      false
+    ],
+    "solution": [
+      "git branch -D friend ice-cream; git branch -D music || true"
+    ]
+  },
+  "branches/reorder": {
+    "wrong": "git checkout donut",
+    "expected_goals": [
+      false,
+      false,
+      false
+    ],
+    "solution": [
+      "git branch -m coffee temp && git branch -m baguette coffee && git branch -m temp baguette",
+      "git checkout donut && echo \"You ate a donut.\" >> you && git commit -am Eat"
+    ]
+  },
+  "merge/merge": {
+    "wrong": "git checkout --detach $(git reflog --all --format=\"%H %gs\" | awk '/commit: You eat the donut$/ {print $1; exit}')",
+    "expected_goals": [
+      false,
+      false
+    ],
+    "solution": [
+      "git checkout --detach $(git reflog --all --format=\"%H %gs\" | awk '/commit: You eat the donut$/ {print $1; exit}') && git merge --no-edit $(git reflog --all --format=\"%H %gs\" | awk '/commit: You eat the baguette$/ {print $1; exit}') && git merge --no-edit $(git reflog --all --format=\"%H %gs\" | awk '/commit: You drink the coffee$/ {print $1; exit}')"
+    ]
+  },
+  "merge/conflict": {
+    "wrong": "git merge --ff-only pancakes && (git merge --no-edit muesli || true) && git add sam && git commit -m Unresolved",
+    "verify_wrong": "git rev-parse --verify main^2 && git show main:sam | grep -q '^<<<<<<<'",
+    "expected_goals": [
+      false
+    ],
+    "solution": [
+      "git merge --no-edit pancakes; git merge --no-edit muesli || true; echo \"Had pancakes and muesli. Is at work.\" > sam; git add sam; git commit -m Compromise"
+    ]
+  },
+  "index/compare": {
+    "wrong": "git checkout step-by-step",
+    "expected_goals": [
+      true,
+      false
+    ],
+    "solution": [
+      "git checkout step-by-step",
+      "echo \"The alarm is ringing\" > smoke_detector && git commit -am Alarm"
+    ]
+  },
+  "index/new": {
+    "wrong": "git status --short",
+    "expected_goals": [
+      false,
+      false
+    ],
+    "solution": [
+      "git add candle",
+      "git commit -m Candle"
+    ]
+  },
+  "index/change": {
+    "wrong": "git add candle",
+    "expected_goals": [
+      false,
+      false,
+      false
+    ],
+    "solution": [
+      "echo extinguished > candle",
+      "git add candle",
+      "git commit -m Extinguish"
+    ]
+  },
+  "index/reset": {
+    "wrong": "git reset HEAD -- red_candle",
+    "expected_goals": [
+      false,
+      false
+    ],
+    "solution": [
+      "git add red_candle && git reset HEAD -- green_candle blue_candle",
+      "git commit -m Red"
+    ]
+  },
+  "index/steps": {
+    "wrong": "git add hammer",
+    "expected_goals": [
+      false,
+      false,
+      false,
+      false,
+      false
+    ],
+    "solution": [
+      "echo fell >> hammer; echo smashed >> bottle; echo dissolved >> sugar_cube",
+      "git add hammer",
+      "git commit -m Hammer",
+      "git add bottle && git commit -m Bottle",
+      "git add sugar_cube && git commit -m Sugar"
+    ]
+  },
+  "remotes/friend": {
+    "wrong": "git fetch friend",
+    "expected_goals": [
+      false,
+      false,
+      false,
+      false
+    ],
+    "solution": [
+      "git pull",
+      "echo Third >> essay && git commit -am Third && git push",
+      "git pull",
+      "echo Fifth >> essay && git commit -am Fifth && git push"
+    ]
+  },
+  "remotes/problems": {
+    "wrong": "git restore file",
+    "verify_wrong": "git diff --quiet && test \"$(git rev-list --count main)\" = 1",
+    "expected_goals": [
+      false,
+      false
+    ],
+    "solution": [
+      "git commit -am Green",
+      "git pull --no-rebase --no-edit || true; echo \"The bike shed should be turquoise\" > file; git add file && git commit -m Compromise && git push"
+    ]
+  },
+  "changing-the-past/rebase": {
+    "wrong": "git checkout donut",
+    "expected_goals": [
+      false
+    ],
+    "solution": [
+      "git rebase baguette coffee && git rebase coffee donut && git branch -f main HEAD"
+    ]
+  },
+  "changing-the-past/reorder": {
+    "wrong": "git checkout --detach main~1",
+    "expected_goals": [
+      false
+    ],
+    "solution": [
+      "git checkout main && git branch original && git reset --hard main~4 && git cherry-pick original~1 original~2 original~3 original"
+    ]
+  },
+  "shit-happens/restore-a-file": {
+    "wrong": "echo incomplete > essay",
+    "expected_goals": [
+      false
+    ],
+    "solution": [
+      "git restore essay"
+    ]
+  },
+  "shit-happens/restore-a-file-from-the-past": {
+    "wrong": "git reset --hard HEAD^",
+    "verify_wrong": "test \"$(git rev-list --count main)\" = 1 && test \"$(cat essay)\" = \"good version\"",
+    "expected_goals": [
+      false
+    ],
+    "solution": [
+      "git restore --source=HEAD^ essay && git commit -am Restored"
+    ]
+  },
+  "shit-happens/bad-commit": {
+    "wrong": "echo \"1 2 3 4 5 6 7 8 9 10\" > numbers && git commit -am \"More numbers\"",
+    "verify_wrong": "git log main --format=%s | grep -Fxq \"More numberrrrrs\"",
+    "expected_goals": [
+      true,
+      true,
+      false
+    ],
+    "solution": [
+      "echo \"1 2 3 4 5 6 7 8 9 10\" > numbers && git commit -a --amend -m \"More numbers\""
+    ]
+  },
+  "shit-happens/pushed-something-broken": {
+    "wrong": "git revert --no-edit HEAD",
+    "expected_goals": [
+      false,
+      true
+    ],
+    "solution": [
+      "git revert --no-edit HEAD^ && git push"
+    ]
+  },
+  "shit-happens/reflog": {
+    "wrong": "git checkout 4",
+    "expected_goals": [
+      false
+    ],
+    "solution": [
+      "git checkout 3"
+    ]
+  },
+  "workflows/pr": {
+    "wrong": "git clone ../friend . && git checkout -b solution && echo \"2 + 3 = 55\" > file && git commit -am Wrong && git tag pr",
+    "verify_wrong": "test \"$(git -C ../friend show main:file)\" = \"2 + 3 = 55\"",
+    "expected_goals": [
+      false
+    ],
+    "solution": [
+      "git clone ../friend .",
+      "git checkout -b solution && echo \"2 + 3 = 5\" > file && git commit -am Solution && git tag pr"
+    ]
+  },
+  "bisect/bisect": {
+    "wrong": "git commit --allow-empty -m 11",
+    "verify_wrong": "test \"$(git log -1 --format=%s)\" = 11 && grep -q empty you",
+    "expected_goals": [
+      false
+    ],
+    "solution": [
+      "git bisect start main main~29 && git bisect run sh -c 'grep -q \"still have\" you' && bad=$(git rev-parse refs/bisect/bad) && git bisect reset && git checkout main && git reset --hard \"$bad^\""
+    ]
+  },
+  "stash/stash": {
+    "wrong": "git add recipe",
+    "expected_goals": [
+      false
+    ],
+    "solution": [
+      "git stash push"
+    ]
+  },
+  "stash/stash-pop": {
+    "wrong": "git stash drop",
+    "verify_wrong": "test -z \"$(git stash list)\" && ! grep -q Flour recipe",
+    "expected_goals": [
+      false
+    ],
+    "solution": [
+      "git stash pop"
+    ]
+  },
+  "stash/stash-clear": {
+    "wrong": "git stash drop",
+    "expected_goals": [
+      false
+    ],
+    "solution": [
+      "git stash clear"
+    ]
+  },
+  "stash/stash-branch": {
+    "wrong": "git branch unrelated",
+    "verify_wrong": "git rev-parse --verify refs/heads/unrelated && git rev-parse --verify refs/stash",
+    "expected_goals": [
+      false
+    ],
+    "solution": [
+      "git stash branch baking"
+    ]
+  },
+  "stash/stash-merge": {
+    "wrong": "git commit --allow-empty -m \"Flour and Salt\" && git stash clear",
+    "verify_wrong": "test \"$(git log -1 --format=%s)\" = \"Flour and Salt\" && test -z \"$(git stash list)\"",
+    "expected_goals": [
+      false,
+      true
+    ],
+    "solution": [
+      "git stash apply || true; printf \"Apple Pie:\\n- 4 Apples\\n- 500g Flour\\n- Pinch of Salt\\n\" > recipe; git add recipe && git commit -m Combine && git stash drop"
+    ]
+  },
+  "tags/add-tag": {
+    "wrong": "git branch v1",
+    "expected_goals": [
+      false
+    ],
+    "solution": [
+      "git tag milestone"
+    ]
+  },
+  "tags/remove-tag": {
+    "wrong": "git tag -d v3",
+    "expected_goals": [
+      false
+    ],
+    "solution": [
+      "git tag -d v1 v2 v3"
+    ]
+  },
+  "tags/add-tag-later": {
+    "wrong": "git branch v1 HEAD^",
+    "verify_wrong": "git rev-parse --verify refs/heads/v1 && ! git show-ref --verify refs/tags/v1",
+    "expected_goals": [
+      false
+    ],
+    "solution": [
+      "git tag -a -m \"Feature two\" v1 HEAD~1"
+    ]
+  },
+  "tags/remote-tag": {
+    "wrong": "git branch v1 HEAD^ && git branch v2 HEAD && git push friend refs/heads/v2",
+    "verify_wrong": "git -C ../friend rev-parse --verify refs/heads/v2 && ! git -C ../friend show-ref --verify refs/tags/v2",
+    "expected_goals": [
+      false,
+      false,
+      false
+    ],
+    "solution": [
+      "git fetch friend --tags && git tag v2 HEAD && git push friend v2"
+    ]
+  },
+  "sandbox/empty": {
+    "wrong": "git switch missing-branch",
+    "expected_goals": [],
+    "solution": [
+      "git switch -c practice && echo practice > exercise && git add exercise && git commit -m Practice"
+    ]
+  },
+  "sandbox/remote": {
+    "wrong": "git switch missing-branch",
+    "expected_goals": [],
+    "solution": [
+      "git switch -c practice && echo practice > exercise && git add exercise && git commit -m Practice"
+    ]
+  },
+  "sandbox/three-commits": {
+    "wrong": "git switch missing-branch",
+    "expected_goals": [],
+    "solution": [
+      "git switch -c practice && echo practice > exercise && git add exercise && git commit -m Practice"
+    ]
+  }
+}

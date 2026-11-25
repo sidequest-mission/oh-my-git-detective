@@ -20,3 +20,7 @@ clean-unzipped:
 	rm -rf build/$(PROJECT_NAME)-linux
 	rm -rf build/$(PROJECT_NAME)-windows
 
+
+.PHONY: test
+test:
+	python3 tests/run_levels.py

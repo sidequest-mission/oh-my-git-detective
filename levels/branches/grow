@@ -30,6 +30,7 @@ echo "You go to the concert!" > you
 git add .
 git commit -m "Go to the concert"
 git branch concert
+git rev-parse concert > .git/concert-start
 
 git checkout HEAD~1
 
@@ -38,12 +39,16 @@ git branch -D main
 [win]
 
 # Travel directly to the last yellow commit of the birthday timeline, make a change to 'you', and make a commit
-for commit in $(git cat-file --batch-check='%(objectname) %(objecttype)' --batch-all-objects | grep 'commit$' | cut -f1 -d' '); do
-    if test $(git rev-parse $commit^) = $(git rev-parse birthday); then
+BIRTHDAY=$(git rev-parse birthday)
+for COMMIT in $(git reflog --format=%H HEAD); do
+    if test "$(git rev-parse --verify "$COMMIT^")" = "$BIRTHDAY" &&
+        test "$(git diff --name-only --diff-filter=M "$BIRTHDAY" "$COMMIT" -- you)" = you; then
         return 0
     fi
 done
 return 1
 
 # Travel to the blue 'concert' branch, make a change to 'you', and a commit.
-git show concert^ | grep "Go to the concert"
+START=$(cat .git/concert-start)
+git merge-base --is-ancestor "$START" concert &&
+test "$(git diff --name-only --diff-filter=M "$START" concert -- you)" = you

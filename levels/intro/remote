@@ -34,11 +34,12 @@ echo "
 
 git add .
 git commit -m "Added two students"
+git rev-parse HEAD > ../yours/.git/teacher-lesson-commit
 
 [win]
 
 # Get the second commit from your teacher using `git pull`.
-test "$(git log --oneline teacher/main | wc -l)" -ge 2
+git merge-base --is-ancestor "$(cat .git/teacher-lesson-commit)" main
 
 # Add your name to the list of students
 test "$(cat students |wc -l)" -ge 5

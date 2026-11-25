@@ -40,7 +40,10 @@ git checkout main
 [win]
 
 # Make a breakfast compromise in the 'main' branch.
-git rev-parse main^ && test "$(git rev-parse main^1^^)" = "$(git rev-parse main^2^^)"
+git merge-base --is-ancestor pancakes main &&
+git merge-base --is-ancestor muesli main &&
+SAM=$(git show main:sam) && test -n "$SAM" &&
+! grep -Eq '^(<{7}|={7}|>{7}|[|]{7})' <<< "$SAM"
 
 [congrats]
 

@@ -49,7 +49,9 @@ func _unhandled_input(event):
 		nodes.scale += Vector2(0.05, 0.05)
 
 func there_is_a_git():
-	return shell.run("test -d .git && echo yes || echo no") == "yes\n"
+	# At the worktree root Git prints "true" followed by an empty path prefix.
+	# A repository discovered in a parent directory belongs to a different graph.
+	return shell.run("git rev-parse --is-inside-work-tree --show-prefix 2>/dev/null", false) == "true\n\n"
 	
 func update_everything():
 	there_is_a_git_cache = there_is_a_git()

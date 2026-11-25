@@ -31,12 +31,15 @@ for i in {1..30}; do
     fi
     git add .
     git commit --allow-empty -m "$i"
+    if test "$i" -eq 11; then
+        git rev-parse HEAD > .git/last-good-commit
+    fi
 done
 
 [win]
 
 # Find the last good commit
-test "$(git log --pretty=%s main | head -1)" -eq 11
+test "$(git rev-parse main)" = "$(cat .git/last-good-commit)"
 
 [congrats]
 
