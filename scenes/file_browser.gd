@@ -25,6 +25,7 @@ var open_file
 @onready var title_label = $Panel/Margin/Rows/Title
 
 func _ready():
+	text_edit.visibility_changed.connect(_update_editor_buttons)
 	update()
 	_set_mode(mode)
 	_set_title(title)
@@ -203,11 +204,15 @@ func _set_commit(new_commit):
 	commit = new_commit
 	update()
 	
+func _update_editor_buttons():
+	save_button.visible = text_edit.visible and mode == FileBrowserMode.WORKING_DIRECTORY
+	$Panel/CloseButton.visible = text_edit.visible
+
 func _set_mode(new_mode):
 	mode = new_mode
 	
 	if save_button:
-		save_button.visible = mode == FileBrowserMode.WORKING_DIRECTORY
+		_update_editor_buttons()
 		text_edit.editable = mode == FileBrowserMode.WORKING_DIRECTORY
 		text_edit.selecting_enabled = mode == FileBrowserMode.WORKING_DIRECTORY
 		if mode == FileBrowserMode.WORKING_DIRECTORY:

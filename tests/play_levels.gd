@@ -43,29 +43,67 @@ func append_line(filename: String, line: String):
 		check(browser.text_edit.visible and browser.text_edit.text == expected, "reopened " + filename)
 		browser.close()
 
+func mouse_button_at(position: Vector2, pressed: bool):
+	var event := InputEventMouseButton.new()
+	event.position = position
+	event.global_position = position
+	event.button_index = MOUSE_BUTTON_LEFT
+	event.pressed = pressed
+	root.push_input(event, true)
+
+func move_mouse(position: Vector2, dragging := false):
+	var event := InputEventMouseMotion.new()
+	event.position = position
+	event.global_position = position
+	event.button_mask = MOUSE_BUTTON_MASK_LEFT if dragging else 0
+	root.push_input(event, true)
+
 func play_commit(message: String):
 	var card = get_first_node_in_group("cards")
-	card._mouse_entered()
-	var mouse := InputEventMouseButton.new()
-	mouse.button_index = MOUSE_BUTTON_LEFT
-	mouse.pressed = true
-	card._unhandled_input(mouse)
-	mouse.pressed = false
-	card._unhandled_input(mouse)
-	card._mouse_exited()
+	# Let the card finish moving into the hand before aiming at it.
+	await create_timer(0.65).timeout
+	var pickup: Vector2 = card.get_node("Area2D").get_global_transform_with_canvas().origin
+	move_mouse(pickup)
+	await physics_frame
+	await physics_frame
+	mouse_button_at(pickup, true)
+	var drop := pickup - Vector2(0, 320)
+	move_mouse(drop, true)
+	await process_frame
+	mouse_button_at(drop, false)
+
 	var editor = screen.terminal.get_node("TextEditor")
 	var deadline := Time.get_ticks_msec() + 10000
 	while not editor.visible and Time.get_ticks_msec() < deadline:
 		await process_frame
-	check(editor.visible, "commit message editor did not open")
-	if editor.visible:
-		editor.insert_text_at_caret(message)
+	check(editor.visible, "dragging the commit card did not open the editor")
+	if not editor.visible:
+		return
+	check(not screen.file_browser.save_button.visible, "closed file editor shows a second Save button")
+	var save_button = editor.get_node("SaveButton")
+	check(editor.get_global_rect().is_equal_approx(screen.terminal.get_global_rect()), "message editor must fill the terminal")
+	check(editor.get_global_rect().encloses(save_button.get_global_rect()), "Save falls outside the editor")
+	check(editor.has_focus() and save_button.disabled, "blank message must have focus and disable Save")
+	for character in message:
+		var key := InputEventKey.new()
+		key.pressed = true
+		key.keycode = character.to_upper().unicode_at(0)
+		key.unicode = character.unicode_at(0)
+		root.push_input(key, true)
+		key.pressed = false
+		root.push_input(key, true)
+	await process_frame
+	check(editor.text == message and not save_button.disabled, "editor did not accept the typed message")
+	var save_at: Vector2 = save_button.get_global_transform_with_canvas() * (save_button.size / 2)
+	move_mouse(save_at)
+	mouse_button_at(save_at, true)
+	mouse_button_at(save_at, false)
+	deadline = Time.get_ticks_msec() + 10000
+	while not screen.terminal.input.editable and Time.get_ticks_msec() < deadline:
 		await process_frame
-		editor.get_node("SaveButton").pressed.emit()
-		await screen.terminal.command_completed
-		check(not editor.visible, "commit editor is still open")
-		var subject = screen.terminal.repository.shell.run("git log -1 --format=%s", false)
-		check(subject.strip_edges() == message, "saved commit message differs")
+	check(not editor.visible and screen.terminal.input.editable, "clicking Save did not finish the commit")
+	var subject = screen.terminal.repository.shell.run("git log -1 --format=%s", false)
+	check(subject.strip_edges() == message, "saved commit message differs")
 
 func act(action):
 	if action is String:
