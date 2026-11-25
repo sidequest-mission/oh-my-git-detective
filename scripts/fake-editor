@@ -19,7 +19,9 @@ my $socket = IO::Socket::INET->new(
 ) or die "Cannot connect to the Oh My Git editor: $!\n";
 binmode $socket, ':raw';
 $socket->autoflush(1);
-print {$socket} pack('V', length($content)), $content
+# Git also uses this editor for rebase instructions and ordinary files.
+my $is_commit = $path =~ m{(?:^|[/\\])COMMIT_EDITMSG\z} ? 1 : 0;
+print {$socket} pack('CV', $is_commit, length($content)), $content
     or die "Cannot send the file to the Oh My Git editor: $!\n";
 
 my $header = read_exact($socket, 4);
