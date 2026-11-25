@@ -17,10 +17,12 @@ git commit -m "The beginning"
 [win]
 
 # Make changes to all three objects, to form a logical sequence of events!
-test "$(git diff --name-only | wc -l)" -eq 3 || file -f .git/candle-changed && touch .git/candle-changed
+test -f .git/candle-changed && return 0
+test "$(git diff --name-only | wc -l)" -eq 3 && touch .git/candle-changed
 
 # Only add one of these changes!
-test "$(git diff --cached --name-only | wc -l)" -eq 1 || file -f .git/candle-added && touch .git/candle-added
+test -f .git/candle-added && return 0
+test "$(git diff --cached --name-only | wc -l)" -eq 1 && touch .git/candle-added
 
 # And make a commit.
 COUNT=0

@@ -22,7 +22,8 @@ echo "The candle is burning with a blue flame." > candle
 [win]
 
 # Add the candle.
-test "$(git diff --cached --name-only)" = "candle" || file -f .git/candle-added && touch .git/candle-added
+test -f .git/candle-added && return 0
+test "$(git diff --cached --name-only)" = "candle" && touch .git/candle-added
 
 # Make a commit.
 test "$(git ls-tree --name-only HEAD)" = "candle"
