@@ -21,7 +21,7 @@ var open_file
 
 @onready var grid = $Panel/Margin/Rows/Scroll/Grid
 @onready var text_edit = $Panel/TextEdit
-@onready var save_button = $Panel/TextEdit/SaveButton
+@onready var save_button = $Panel/SaveButton
 @onready var title_label = $Panel/Margin/Rows/Title
 
 func _ready():
@@ -182,16 +182,21 @@ func close():
 	emit_signal("saved")
 	
 func save():
-	match mode:
-		FileBrowserMode.WORKING_DIRECTORY:
-			var fixme_path = repository.shell._cwd
-	
-			# Add a newline to the end of the file if there is none.
-			if text_edit.text.length() > 0 and text_edit.text.substr(text_edit.text.length()-1, 1) != "\n":
-				text_edit.text += "\n"
-			
-			helpers.write_file(fixme_path+open_file, text_edit.text)
-			update()
+	if mode != FileBrowserMode.WORKING_DIRECTORY:
+		return
+	if repository == null or open_file == null or open_file.is_empty():
+		push_error("Cannot save: no working-directory file is open")
+		return
+
+	# Add a newline to the end of the file if there is none.
+	if text_edit.text.length() > 0 and text_edit.text.substr(text_edit.text.length()-1, 1) != "\n":
+		text_edit.text += "\n"
+
+	var file_path = repository.shell._cwd.path_join(open_file)
+	if not helpers.write_file(file_path, text_edit.text):
+		game.notify("Could not save %s. Check the application log for details." % open_file, self)
+		return
+	update()
 	close()
 
 func _set_commit(new_commit):

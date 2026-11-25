@@ -54,14 +54,24 @@ func write_file(path, content):
 		print("writing " + path)
 	
 	# Create the base directory of the file, if it doesn't exist.
-	var parts = Array(path.split("/"))
-	parts.pop_back()
-	var dirname = "/".join(PackedStringArray(parts))
-	if not DirAccess.dir_exists_absolute(path):
-		DirAccess.make_dir_recursive_absolute(dirname)
-		
+	var dirname = path.get_base_dir()
+	if not DirAccess.dir_exists_absolute(dirname):
+		var directory_error = DirAccess.make_dir_recursive_absolute(dirname)
+		if directory_error != OK:
+			push_error("Could not create directory %s (error %d)" % [dirname, directory_error])
+			return false
+
 	var file = FileAccess.open(path, FileAccess.WRITE)
+	if file == null:
+		push_error("Could not open file for writing: %s" % path)
+		return false
 	file.store_string(content)
+	file.flush()
+	var write_error = file.get_error()
+	file.close()
+	if write_error != OK:
+		push_error("Could not finish writing file %s (error %d)" % [path, write_error])
+		return false
 	return true
 
 func parse_args():
