@@ -8,8 +8,8 @@ linux:
 	cd build && zip -r $(PROJECT_NAME)-linux.zip $(PROJECT_NAME)-linux
 
 macos:
-	mkdir -p build/$(PROJECT_NAME)-macos
-	godot --headless --export-release "macOS" "build/$(PROJECT_NAME)-macos/$(PROJECT_NAME).zip"
+	mkdir -p build
+	godot --headless --export-release "macOS" "build/$(PROJECT_NAME)-macos.zip"
 
 windows:
 	mkdir -p build/$(PROJECT_NAME)-windows
@@ -18,6 +18,5 @@ windows:
 
 clean-unzipped:
 	rm -rf build/$(PROJECT_NAME)-linux
-	rm -rf build/$(PROJECT_NAME)-macos
 	rm -rf build/$(PROJECT_NAME)-windows
 
