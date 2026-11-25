@@ -26,8 +26,9 @@ func _ready():
 	
 	if OS.has_feature("standalone"):
 		get_tree().set_auto_accept_quit(false)
-	else:
-		game.toggle_music()
+	var music = get_node("Music")
+	if not music.playing:
+		music.play()
 	
 	if OS.get_name() == "Windows":
 		start_remote_shell()
