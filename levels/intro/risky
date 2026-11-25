@@ -39,4 +39,4 @@ test "$(cat form.txt | wc -l )" -ge 5 && echo "(Has been stolen by your cat.)
 [win]
 
 # Add another line to form.txt!
-test "$(cat form.txt | wc -l )" -ge 5
+grep -Fq "(Has been stolen by your cat.)" form.txt
