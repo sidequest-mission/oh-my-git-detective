@@ -11,9 +11,7 @@ You're almost done with the paperwork! You just need to fill in one more reason 
 
 [congrats]
 
-Suddenly, your cat jumps on the table, snatches away the form, and runs away! Oh no. All your hard work, gone!
-
-You clearly need a better solution.
+Your form is ready! But what if your cat snatched it off the table? Let's make a backup.
 
 (Click "Next Level" as soon as you're ready!)
 
@@ -26,17 +24,7 @@ echo "~ Why I want to learn Git ~
 - So that I can undo mistakes
 - To track my projects over time" >> form.txt
 
-[actions]
-
-test "$(cat form.txt | wc -l )" -ge 5 && echo "(Has been stolen by your cat.)
-
-
-
-
-
-" > form.txt
-
 [win]
 
 # Add another line to form.txt!
-grep -Fq "(Has been stolen by your cat.)" form.txt
+awk 'NF { reasons++ } END { exit !(NR >= 5 && reasons >= 4) }' form.txt
