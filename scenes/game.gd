@@ -10,10 +10,10 @@ var fake_editor
 var dragged_object
 var energy = 2
 var used_cards = false
+var music_muted = false
 
 var current_chapter = 0
 var current_level = 0
-var skipped_title = false
 
 var _file = "user://savegame.json"
 var state = {}
@@ -43,7 +43,6 @@ func _ready():
 #	helpers.crash(":)")
 
 	if global_shell.run("command -v git &>/dev/null && echo yes || echo no") == "no\n":
-		game.skipped_title = true
 		get_tree().change_scene_to_file("res://scenes/no_git.tscn")
 	else:
 		create_file_in_game_env(".gitconfig", helpers.read_file("res://scripts/gitconfig"))
@@ -130,11 +129,13 @@ func open_survey():
 	OS.shell_open("https://patreon.com/blinry")
 	
 func toggle_music():
-	var music = game.find_child("Music")
-	if music.volume_db > -20:
-		music.volume_db -= 100
-	else:
-		music.volume_db += 100
+	var music = get_node_or_null("Music")
+	if music == null:
+		return
+	music_muted = not music_muted
+	music.volume_db = -80.0 if music_muted else -15.0
+	if not music_muted and not music.playing:
+		music.play()
 
 func shell_test(command):
 	mutex.lock()
