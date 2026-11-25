@@ -1,75 +1,76 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=3]
 
-[ext_resource path="res://styles/theme.tres" type="Theme" id=1]
-[ext_resource path="res://images/oh-my-git.png" type="Texture2D" id=2]
-[ext_resource path="res://scenes/title.gd" type="Script" id=3]
-[ext_resource path="res://fonts/default.tres" type="FontFile" id=5]
+[ext_resource type="Theme" path="res://styles/theme.tres" id="1"]
+[ext_resource type="Texture2D" path="res://images/detective-title.png" id="2"]
+[ext_resource type="Script" path="res://scenes/title.gd" id="3"]
+[ext_resource type="FontFile" path="res://fonts/cabin-regular.ttf" id="4"]
+[ext_resource type="FontFile" path="res://fonts/cabin-bold.ttf" id="5"]
 
 [node name="Title" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-theme = ExtResource( 1 )
-script = ExtResource( 3 )
+theme = ExtResource("1")
+script = ExtResource("3")
 
-[node name="Label2" type="Label" parent="."]
-offset_left = 790.778
-offset_top = 594.135
-offset_right = 1131.78
-offset_bottom = 650.135
-theme_override_colors/font_color = Color( 0.533333, 0.392157, 0.392157, 1 )
-theme_override_fonts/font = ExtResource( 5 )
-text = "by bleeptrack & blinry"
-align = 1
-__meta__ = {
-"_edit_use_anchors_": false
-}
+[node name="Logo" type="TextureRect" parent="."]
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -482.0
+offset_right = 482.0
+offset_bottom = 588.0
+mouse_filter = 2
+accessibility_name = "Oh My Git! Detective Version"
+texture = ExtResource("2")
+expand_mode = 1
+stretch_mode = 5
 
-[node name="Label3" type="Label" parent="."]
-offset_left = 709.713
-offset_top = 621.416
-offset_right = 1209.71
-offset_bottom = 677.416
-theme_override_colors/font_color = Color( 0.533333, 0.392157, 0.392157, 1 )
-theme_override_fonts/font = ExtResource( 5 )
-text = "Original score by winniehell"
-align = 1
-__meta__ = {
-"_edit_use_anchors_": false
-}
+[node name="Credits" type="RichTextLabel" parent="."]
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -520.0
+offset_top = 590.0
+offset_right = 520.0
+offset_bottom = 753.0
+mouse_filter = 2
+theme_override_fonts/normal_font = ExtResource("4")
+theme_override_fonts/bold_font = ExtResource("5")
+theme_override_font_sizes/normal_font_size = 38
+theme_override_font_sizes/bold_font_size = 38
+theme_override_constants/line_separation = 2
+theme_override_colors/default_color = Color(0.98, 0.97, 0.95, 1)
+bbcode_enabled = true
+text = "[center]Original game by [b]bleeptrack[/b] & [b]blinry[/b]
+Updates and new levels by [b]jrosengarten[/b]
+Original score by [b]winniehell[/b][/center]"
+scroll_active = false
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
-offset_left = 784.553
-offset_top = 702.517
-offset_right = 1136.55
-offset_bottom = 885.517
-__meta__ = {
-"_edit_use_anchors_": false
-}
+[node name="Menu" type="VBoxContainer" parent="."]
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -250.0
+offset_top = 776.0
+offset_right = 250.0
+offset_bottom = 1030.0
+theme_override_constants/separation = 18
 
-[node name="Button" type="Button" parent="VBoxContainer"]
-offset_right = 351.0
-offset_bottom = 39.0
+[node name="Levels" type="Button" parent="Menu"]
+custom_minimum_size = Vector2(0, 72)
+theme_override_fonts/font = ExtResource("5")
+theme_override_font_sizes/font_size = 41
 text = "Levels"
 
-[node name="Button3" type="Button" parent="VBoxContainer"]
-offset_top = 44.0
-offset_right = 351.0
-offset_bottom = 83.0
+[node name="Sandbox" type="Button" parent="Menu"]
+custom_minimum_size = Vector2(0, 72)
+theme_override_fonts/font = ExtResource("5")
+theme_override_font_sizes/font_size = 41
 text = "Sandbox"
 
-[node name="Button2" type="Button" parent="VBoxContainer"]
-offset_top = 88.0
-offset_right = 351.0
-offset_bottom = 127.0
+[node name="Quit" type="Button" parent="Menu"]
+custom_minimum_size = Vector2(0, 72)
+theme_override_fonts/font = ExtResource("5")
+theme_override_font_sizes/font_size = 41
 text = "Quit"
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
-
-[node name="oh-my-git" type="Sprite2D" parent="Sprite2D"]
-position = Vector2( 967.924, 306.066 )
-scale = Vector2( 0.320895, 0.320895 )
-texture = ExtResource( 2 )
-
-[connection signal="pressed" from="VBoxContainer/Button" to="." method="levels"]
-[connection signal="pressed" from="VBoxContainer/Button3" to="." method="sandbox"]
-[connection signal="pressed" from="VBoxContainer/Button2" to="." method="quit"]
+[connection signal="pressed" from="Menu/Levels" to="." method="levels"]
+[connection signal="pressed" from="Menu/Sandbox" to="." method="sandbox"]
+[connection signal="pressed" from="Menu/Quit" to="." method="quit"]
