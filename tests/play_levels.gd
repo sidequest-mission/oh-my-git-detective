@@ -79,7 +79,10 @@ func check_back_navigation():
 	await process_frame
 	if not await click_to_scene(current_scene.get_node("Menu/Levels"), selector):
 		return
-	if not await click_to_scene(current_scene.get_node("Button"), title):
+	var back_button = current_scene.get_node("Button")
+	var connections = back_button.pressed.get_connections()
+	check(connections.size() == 1 and connections[0].callable.get_bound_arguments_count() == 0, "level menu Back must have one connection with no extra arguments")
+	if not await click_to_scene(back_button, title):
 		return
 	if not await click_to_scene(current_scene.get_node("Menu/Levels"), selector):
 		return

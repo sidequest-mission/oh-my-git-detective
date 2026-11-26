@@ -49,6 +49,9 @@ jobs:
       - name: Build Linux
         run: make linux
 
+      - name: Test packaged menu navigation
+        run: python3 tests/run_menu.py build/oh-my-git-linux/oh-my-git
+
       - name: Build macOS
         run: make macos
 

@@ -3,6 +3,7 @@ extends Control
 @onready var level_list = $ScrollContainer/MarginContainer/Levels
 
 func _ready():
+	$Button.pressed.connect(back)
 	reload()
 
 func load(chapter_id, level_id):

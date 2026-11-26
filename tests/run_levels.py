@@ -43,7 +43,7 @@ def main():
             stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, timeout=600,
         )
         if run.returncode or "PASS all level regressions" not in run.stdout or any(
-            marker in run.stdout for marker in ("FATAL ERROR", "SCRIPT ERROR", "Duplicate section [")
+            marker in run.stdout for marker in ("FATAL ERROR", "SCRIPT ERROR", "Error calling from signal", "Duplicate section [")
         ):
             sys.exit(run.stdout)
         print("\n".join(line for line in run.stdout.splitlines() if line.startswith("PASS ")))
