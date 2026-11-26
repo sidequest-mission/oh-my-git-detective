@@ -192,7 +192,8 @@ func apply_forces():
 				continue
 			var d = o.position.distance_to(o2.position)
 			var dir = (o.global_position - o2.global_position).normalized()
-			var f = 2000/pow(d+0.00001,1.5)
+			# Nearly overlapping objects should separate without jumping off screen.
+			var f = 2000 / pow(maxf(d, 16.0), 1.5)
 			o.position += dir*f
 			o2.position -= dir*f
 		var center_of_gravity = nodes.size/2

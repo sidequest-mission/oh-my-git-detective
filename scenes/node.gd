@@ -10,11 +10,13 @@ var repository: Control
 var children = {}: set = children_set
 var id_always_visible = false
 var held = false
-var hovered = false
 
 var arrow = preload("res://scenes/arrow.tscn")
 
 func _ready():
+	$HitTarget.mouse_entered.connect(_on_hover)
+	$HitTarget.mouse_exited.connect(_on_unhover)
+	$HitTarget.gui_input.connect(_on_hit_target_input)
 	content_set(content)
 	type_set(type)
 	id_set(id)
@@ -112,24 +114,21 @@ func children_set(new_children):
 	children = new_children
 
 func _on_hover():
-	hovered = true
 	if not id_always_visible and type != "head":
 		content_label.visible = true
 		#$ID.visible = true
 	
 func _on_unhover():
-	hovered = false
 	if not id_always_visible and type != "head":
 		content_label.visible = false
 		#$ID.visible = false
 
-func _input(event):
-	if hovered:
-		if event.is_action_pressed("click") and type != "head":
-			held = true
-		elif event.is_action_pressed("right_click"):
-			var input = get_tree().get_current_scene().find_child("Input")
-			input.text += id
-			input.caret_column = input.text.length()
-	if event.is_action_released("click"):
-		held = false
+func _on_hit_target_input(event: InputEvent):
+	if event.is_action_pressed("click") and type != "head":
+		held = true
+	elif event.is_action_pressed("right_click"):
+		var input: LineEdit = get_tree().get_first_node_in_group("terminal_input")
+		if input and input.editable and input.is_visible_in_tree():
+			input.grab_focus()
+			input.insert_text_at_caret(id)
+			$HitTarget.accept_event()

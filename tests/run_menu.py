@@ -1,4 +1,4 @@
-"""Check Back with an exported game player on macOS or Linux."""
+"""Check navigation and graph right-clicks with an exported game player on macOS or Linux."""
 
 import json
 import os
