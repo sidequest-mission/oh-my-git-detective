@@ -135,8 +135,7 @@ func reload_level():
 func load_next_level():
 	game.current_level += 1
 	if game.current_level >= levels.chapters[game.current_chapter].levels.size():
-		
-		back()
+		get_tree().change_scene_to_file("res://scenes/level_select.tscn")
 	else:
 		load_level(game.current_level)
 	
@@ -226,4 +225,4 @@ func new_tip():
 		level_description.text += level.description[level.tipp_level]
 
 func back():
-	get_tree().change_scene_to_file("res://scenes/level_select.tscn")
+	get_tree().change_scene_to_file("res://scenes/title.tscn")

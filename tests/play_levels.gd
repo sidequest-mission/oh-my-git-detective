@@ -58,6 +58,41 @@ func move_mouse(position: Vector2, dragging := false):
 	event.button_mask = MOUSE_BUTTON_MASK_LEFT if dragging else 0
 	root.push_input(event, true)
 
+func click_to_scene(button: Button, destination: String) -> bool:
+	var center: Vector2 = button.get_global_transform_with_canvas() * (button.size / 2)
+	move_mouse(center)
+	mouse_button_at(center, true)
+	mouse_button_at(center, false)
+	await process_frame
+	await process_frame
+	var reached := current_scene != null and current_scene.scene_file_path == destination
+	check(reached, "expected to reach " + destination)
+	return reached
+
+func check_back_navigation():
+	level_key = "Back navigation"
+	var title := "res://scenes/title.tscn"
+	var selector := "res://scenes/level_select.tscn"
+	var gameplay := "res://scenes/main.tscn"
+	change_scene_to_file(title)
+	await scene_changed
+	await process_frame
+	if not await click_to_scene(current_scene.get_node("Menu/Levels"), selector):
+		return
+	if not await click_to_scene(current_scene.get_node("Button"), title):
+		return
+	if not await click_to_scene(current_scene.get_node("Menu/Levels"), selector):
+		return
+	var first_lesson: Button = current_scene.level_list.find_children("*", "Button", true, false)[0]
+	if not await click_to_scene(first_lesson, gameplay):
+		return
+	if not await click_to_scene(current_scene.get_node("Menu/BackButton"), title):
+		return
+	if not await click_to_scene(current_scene.get_node("Menu/Sandbox"), gameplay):
+		return
+	if await click_to_scene(current_scene.get_node("Menu/BackButton"), title):
+		print("PASS Back navigation")
+
 func play_commit(message: String):
 	var card = get_first_node_in_group("cards")
 	# Let the card finish moving into the hand before aiming at it.
@@ -167,6 +202,7 @@ func run():
 	var chapters = root.get_node("levels").chapters
 	var cases = JSON.parse_string(FileAccess.get_file_as_string(OS.get_cmdline_user_args()[0]))
 	var count := 0
+	await check_back_navigation()
 	for ci in chapters.size():
 		var chapter = chapters[ci]
 		for li in chapter.levels.size():
